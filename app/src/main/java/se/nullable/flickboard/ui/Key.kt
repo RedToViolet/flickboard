@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -92,12 +93,12 @@ fun Key(
     modifier: Modifier = Modifier,
     enterKeyLabel: String? = null,
     keyPointerTrailListener: State<KeyPointerTrailListener?> = remember { mutableStateOf(null) },
+    keyWidth: Dp = 100.dp,
 ) {
     val haptic = LocalHapticFeedback.current
     val settings = LocalAppSettings.current
     val actionVisualScale = settings.actionVisualScale.state
     val scale = settings.currentScale
-    val keyHeight = settings.keyHeight.state.value * scale
     val keyRoundness = settings.keyRoundness.state
     val keyOpacity = settings.keyOpacity.state
     val enableFastActions = settings.enableFastActions.state
@@ -137,10 +138,16 @@ fun Key(
     }
     var lastActionTaken: TakenAction? by remember { mutableStateOf(null, neverEqualPolicy()) }
     var lastActionIsVisible by remember { mutableStateOf(false) }
+    val keyAspectRatio = (settings.keyAspectRatio.state.value * 100).toInt() / 100F
     val lastActionAlpha = animateFloatAsState(1F * lastActionIsVisible, label = "lastActionAlpha") {
         if (!lastActionIsVisible) {
             lastActionTaken = null
         }
+    }
+    var keyHeight = if (keyAspectRatio <= 0.5F) {
+        keyWidth * (keyAspectRatio + 0.5F)
+    } else {
+        keyWidth * keyAspectRatio * 2F
     }
     LaunchedEffect(lastActionTaken) {
         lastActionIsVisible = lastActionTaken != null
@@ -213,7 +220,7 @@ fun Key(
                 keySurfaceColour.value.copy(alpha = keyOpacity.value),
                 shape = shape
             )
-            .height(keyHeight.dp)
+            .height(keyHeight)
             .then(onActionModifier)
     ) {
         KeyLabelGrid(

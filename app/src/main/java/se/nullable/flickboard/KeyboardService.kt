@@ -444,7 +444,7 @@ class KeyboardService : InputMethodService(), LifecycleOwner, SavedStateRegistry
                                 }
 
                                 is Action.AdjustCellHeight ->
-                                    appSettings.keyHeight.currentValue += action.amount
+                                    appSettings.keyAspectRatio.currentValue += action.amount
 
                                 Action.ToggleEmojiMode ->
                                     emojiMode = !emojiMode
