@@ -155,12 +155,14 @@ fun Keyboard(
                 this.contentDescription = "FlickBoard keyboard"
             }
     ) {
+        val columns = layer.keyRows.maxOf { row -> row.sumOf { it.colspan } }
         var thisWidth = maxWidth
         LocalDisplayLimits.current?.let { limits ->
             // Enforce portrait aspect ratio in landscape mode
             thisWidth = min(thisWidth, limits.portraitWidth)
         }
         thisWidth *= appSettings.currentScale
+        val columnWidth = thisWidth / columns
         Grid(
             modifier = Modifier
                 .width(thisWidth)
@@ -215,7 +217,8 @@ fun Keyboard(
                                     keyPosition.value = it.positionInRoot() - globalPosition
                                 },
                             enterKeyLabel = enterKeyLabel,
-                            keyPointerTrailListener = keyPointerTrailListener
+                            keyPointerTrailListener = keyPointerTrailListener,
+                            columnWidth
                         )
                     }
                 }
@@ -269,7 +272,7 @@ fun PlayKeyboardPreview() {
         Surface {
             val appSettings = LocalAppSettings.current
             AppSettingsProvider(prefs = MockedSharedPreferences(appSettings.ctx.prefs).also {
-                appSettings.keyHeight.writeTo(it, 128F)
+                appSettings.keyAspectRatio.writeTo(it, 128F)
             }) {
                 ConfiguredKeyboard(onAction = { lastAction = it })
             }

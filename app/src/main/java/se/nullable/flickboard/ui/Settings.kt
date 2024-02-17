@@ -617,12 +617,13 @@ class AppSettings(val ctx: SettingsContext) {
         ctx = ctx
     )
 
-    val keyHeight = Setting.FloatSlider(
-        key = "keyHeight",
-        label = "Key height",
-        defaultValue = 72F,
-        range = 48F..96F,
-        ctx = ctx
+    val keyAspectRatio = Setting.FloatSlider(
+        key = "keyAspectRatio",
+        label = "Key aspect ratio",
+        defaultValue = 0.5F,
+        range = 0.0F..1F,
+        ctx = ctx,
+        render = Setting.FloatSlider::ratio
     )
 
     val swipeThreshold = Setting.FloatSlider(
@@ -709,6 +710,7 @@ class AppSettings(val ctx: SettingsContext) {
                     showLetters,
                     showSymbols,
                     showNumbers,
+                    keyAspectRatio,
                     keyRoundness,
                     actionVisualBiasCenter,
                     actionVisualScale,
@@ -724,7 +726,6 @@ class AppSettings(val ctx: SettingsContext) {
                 settings = listOf(
                     enableFastActions,
                     longHoldOnClockwiseCircle,
-                    keyHeight,
                     swipeThreshold,
                     fastSwipeThreshold,
                     circleJaggednessThreshold,
@@ -881,6 +882,15 @@ sealed class Setting<T : Any>(private val ctx: SettingsContext) {
         companion object {
             fun percentage(x: Float): String = "${(x * 100).roundToInt()}%"
             fun angle(x: Float): String = "${Math.toDegrees(x.toDouble()).roundToInt()}°"
+            fun ratio(x: Float): String {
+                return if (x <= 0.49F) {
+                    String.format("%.2f:1", 1 / (x + 0.5F))
+                } else if (x >= 0.51){
+                    String.format("1:%.2f", x * 2)
+                } else {
+                    "1:1"
+                }
+            }
         }
     }
 
