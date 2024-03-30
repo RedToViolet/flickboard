@@ -98,7 +98,6 @@ fun Key(
     val haptic = LocalHapticFeedback.current
     val settings = LocalAppSettings.current
     val actionVisualScale = settings.actionVisualScale.state
-    val scale = settings.currentScale
     val keyRoundness = settings.keyRoundness.state
     val keyOpacity = settings.keyOpacity.state
     val enableFastActions = settings.enableFastActions.state
@@ -144,7 +143,7 @@ fun Key(
             lastActionTaken = null
         }
     }
-    var keyHeight = if (keyAspectRatio <= 0.5F) {
+    val keyHeight = if (keyAspectRatio <= 0.5F) {
         keyWidth * (keyAspectRatio + 0.5F)
     } else {
         keyWidth * keyAspectRatio * 2F
